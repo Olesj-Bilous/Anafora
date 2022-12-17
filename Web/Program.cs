@@ -4,40 +4,71 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using AnaforaData.Context;
+using System.Security.Claims;
+using AnaforaData.Model;
+using AnaforaWeb.Authorization;
+using AnaforaWeb.Utils.Extensions;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using AnaforaWeb.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-    .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
+builder.Services.AddDbContext<DataContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DataContextConnection")
+        ?? throw new InvalidOperationException("Connection string 'DataContextConnection' not found.")));
+
+builder.Services.AddIdentityCore<User>().AddRoles<Role>()
+    .AddEntityFrameworkStores<DataContext>()
+    .AddDefaultUI();
+
+builder.Services.AddDistributedMemoryCache(); // adds default in-memory cache as IDistributedCache
+builder.Services.AddSingleton<ITicketStore, TicketStore>(); // depends surjectively on IDistributedCache
+
+builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)
+    .AddIdentityCookies(identity => identity.ApplicationCookie.Configure<ITicketStore>((cookie, store) =>
+    {
+        cookie.SessionStore = store;
+        cookie.LoginPath = "/Identity/Account/Login"; // for compatibility with Identity default UI
+        cookie.Cookie.IsEssential = true;
+    }));
+
+builder.Services.AddSingleton<IAuthorizationHandler, ContentAuthorizationHandler>();
+builder.Services.AddSingleton<IAuthorizationPolicyProvider, ContentPolicyProvider>();
 
 builder.Services.AddAuthorization(options =>
 {
-    // By default, all incoming requests will be authorized according to the default policy.
-    options.FallbackPolicy = options.DefaultPolicy;
+    options.FallbackPolicy = options.DefaultPolicy; // fall back to authentication
 });
-builder.Services.AddRazorPages()
-    .AddMicrosoftIdentityUI();
+
+builder.Services.AddRazorPages();
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
+var seeding = app.Services.SeedDataContext("admin@anafora.net",
+    // set password in project folder: dotnet user-secrets set anafora-admin-password <password>
+    builder.Configuration.GetValue<string>("anafora-admin-password"));
+
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsProduction())
 {
     app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    
+    app.UseHsts(); // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 }
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
-app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
 app.MapControllers();
+
+await seeding;
 
 app.Run();

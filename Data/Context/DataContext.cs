@@ -1,13 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AnaforaData.Model;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
-namespace Data.Context
+namespace AnaforaData.Context
 {
-    public class DataContext : DbContext
+    public class DataContext : IdentityDbContext<User, Role, Guid>
     {
+        public DataContext(DbContextOptions<DataContext> options) : base(options)
+        {
+
+        }
     }
 }
