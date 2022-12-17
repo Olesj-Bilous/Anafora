@@ -20,8 +20,10 @@ builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DataContextConnection")
         ?? throw new InvalidOperationException("Connection string 'DataContextConnection' not found.")));
 
-builder.Services.AddIdentityCore<User>().AddRoles<Role>()
+builder.Services.AddIdentityCore<User>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddRoles<Role>()
     .AddEntityFrameworkStores<DataContext>()
+    .AddDefaultTokenProviders()
     .AddDefaultUI();
 
 builder.Services.AddDistributedMemoryCache(); // adds default in-memory cache as IDistributedCache
