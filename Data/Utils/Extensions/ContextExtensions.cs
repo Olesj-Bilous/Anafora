@@ -9,7 +9,6 @@ namespace AnaforaData.Utils.Extensions
     {
         public static async Task SeedAsync(this DataContext context, UserManager<User> manager, string adminEmail, string adminPassword)
         {
-            //await new Task(() => { Console.Write(""); Console.Write(""); });
             await context.SeedIdentityAsync(manager, adminEmail, adminPassword);
             await context.SaveChangesAsync().ConfigureAwait(false);
         }
