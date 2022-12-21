@@ -1,13 +1,14 @@
 ﻿using AnaforaData.Context;
 using AnaforaData.Model;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 namespace AnaforaData.Utils.Extensions
 {
     public static partial class ContextExtensions
     {
-        public static async Task SeedAsync(this DataContext context, UserManager<User> manager, string adminEmail, string adminPassword)
+        public static async Task SeedAsync(this DataContext context, UserManager<User> manager, IActionDescriptorCollectionProvider descriptors, string adminEmail, string adminPassword)
         {
             await context.SeedIdentityAsync(manager, adminEmail, adminPassword);
             await context.SaveChangesAsync().ConfigureAwait(false);

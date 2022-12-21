@@ -20,8 +20,8 @@ namespace AnaforaWeb.Authorization
 
                 Claim claim = context.User.Claims.FirstOrDefault(claim => claim.Type == ctrlRoute);
 
-                if (claim != null && Enum.TryParse(typeof(Permissions), claim.Value, out var permObj)
-                    && ((Permissions)permObj & requirement.Permissions) == requirement.Permissions)
+                if (claim != null && Enum.TryParse(typeof(Permissions), claim.Value, out var permission)
+                    && ((Permissions)permission & requirement.Permissions) == requirement.Permissions)
                 {
                     context.Succeed(requirement);
                 }

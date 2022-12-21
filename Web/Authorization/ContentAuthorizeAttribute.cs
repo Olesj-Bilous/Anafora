@@ -6,7 +6,7 @@ namespace AnaforaWeb.Authorization
 {
     public class ContentAuthorizeAttribute : AuthorizeAttribute
     {
-        const string policy_prefix = "Content";
+        public const string policy_prefix = "Content";
 
         public ContentAuthorizeAttribute(Permissions permissions)
         {

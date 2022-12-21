@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Web.Pages
 {
-    [AllowAnonymous]
+    [ContentAuthorize(Permissions.Read)]
     public class IndexModel : PageModel
     {
         private readonly ILogger<IndexModel> _logger;

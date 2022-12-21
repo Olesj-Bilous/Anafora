@@ -5,6 +5,7 @@ using AnaforaData.Utils.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace AnaforaWeb.Utils.Extensions;
 
@@ -15,12 +16,12 @@ public static class ServiceExtensions
         await using var scope = services.CreateAsyncScope();
 
         DataContext context = scope.ServiceProvider.GetRequiredService<DataContext>();
-        await context.Database.MigrateAsync();
-
-        IActionDescriptorCollectionProvider provider = scope.ServiceProvider.GetService<IActionDescriptorCollectionProvider>();
-        var items = provider.ActionDescriptors.Items; // hook for content authorization policy (in development)
+        var migration = context.Database.MigrateAsync();
 
         UserManager<User> manager = scope.ServiceProvider.GetService<UserManager<User>>();
-        await context.SeedAsync(manager, adminEmail, adminPassword);
+        IActionDescriptorCollectionProvider provider = scope.ServiceProvider.GetService<IActionDescriptorCollectionProvider>();
+
+        await migration;
+        await context.SeedAsync(manager, provider, adminEmail, adminPassword).ConfigureAwait(false);
     }
 }

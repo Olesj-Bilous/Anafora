@@ -2,24 +2,32 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 
 namespace AnaforaWeb.Authorization
 {
     public class ContentPolicyProvider : IAuthorizationPolicyProvider
     {
-        const string policy_prefix = "Content";
+        public ContentPolicyProvider(IOptions<AuthorizationOptions> options)
+        {
+            BackupPolicyProvider = new DefaultAuthorizationPolicyProvider(options);
+        }
+
+        private IAuthorizationPolicyProvider BackupPolicyProvider { get; }
+
+        private const string policy_prefix = "Content";
 
         public Task<AuthorizationPolicy> GetPolicyAsync(string policyName)
         {
-            if (policyName.StartsWith(policy_prefix, StringComparison.OrdinalIgnoreCase)
+            if (policyName.StartsWith(ContentAuthorizeAttribute.policy_prefix, StringComparison.OrdinalIgnoreCase)
                 && Enum.TryParse(typeof(Permissions), policyName.Split('_').Last(), out var permission))
             {
-                return Task.FromResult(new AuthorizationPolicyBuilder(policyName)
+                return Task.FromResult(new AuthorizationPolicyBuilder(IdentityConstants.ApplicationScheme)
                     .AddRequirements(new ContentRequirement((Permissions)permission))
                     .Build());
             }
 
-            return GetDefaultPolicyAsync();
+            return BackupPolicyProvider.GetPolicyAsync(policyName);
         }
 
         public Task<AuthorizationPolicy> GetDefaultPolicyAsync()
