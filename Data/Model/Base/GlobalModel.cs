@@ -1,7 +1,7 @@
 ﻿namespace AnaforaData.Model
 {
-    public class GlobalModel
+    public interface IGlobalModel
     {
-        public Guid Guid { get; set; }
+        public Guid Id { get; set; }
     }
 }

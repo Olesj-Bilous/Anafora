@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AnaforaWeb.Controllers
 {
-    public abstract class Controller<T> : Controller where T : GlobalModel
+    public abstract class Controller<T> : Controller where T : IGlobalModel
     {
         public Controller()
         {
