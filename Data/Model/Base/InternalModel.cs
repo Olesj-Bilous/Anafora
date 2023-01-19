@@ -1,6 +1,6 @@
 ﻿namespace AnaforaData.Model
 {
-    public class InternalModel
+    public interface IInternalModel
     {
         public int Id { get; set; }
     }
