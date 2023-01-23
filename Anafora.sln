@@ -9,6 +9,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnaforaData", "Data\Anafora
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnaforaWeb", "Web\AnaforaWeb.csproj", "{CD1A3A38-CF5D-4146-8E75-6F2714D2621D}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnaforaBenchmark", "AnaforaBenchmark\AnaforaBenchmark.csproj", "{81967F2E-24D5-4102-8470-A163C9E9BB17}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnaforaDataLab", "AnaforaDataLab\AnaforaDataLab.csproj", "{E7672223-1A51-4097-B4FB-DB12211D41FC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{CD1A3A38-CF5D-4146-8E75-6F2714D2621D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CD1A3A38-CF5D-4146-8E75-6F2714D2621D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CD1A3A38-CF5D-4146-8E75-6F2714D2621D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81967F2E-24D5-4102-8470-A163C9E9BB17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81967F2E-24D5-4102-8470-A163C9E9BB17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81967F2E-24D5-4102-8470-A163C9E9BB17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81967F2E-24D5-4102-8470-A163C9E9BB17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7672223-1A51-4097-B4FB-DB12211D41FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7672223-1A51-4097-B4FB-DB12211D41FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7672223-1A51-4097-B4FB-DB12211D41FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7672223-1A51-4097-B4FB-DB12211D41FC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
