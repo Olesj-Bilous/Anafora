@@ -21,4 +21,9 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AnaforaDataLab\AnaforaDataLab.csproj" />
+    <ProjectReference Include="..\Data\AnaforaData.csproj" />
+  </ItemGroup>
+
 </Project>
