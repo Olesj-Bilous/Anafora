@@ -1,5 +1,6 @@
 using AnaforaDataLab.Context.Dynamics;
 using AnaforaDataLab.Utils;
+using Microsoft.EntityFrameworkCore;
 
 namespace AnaforaTest
 {
@@ -8,14 +9,14 @@ namespace AnaforaTest
         [Fact]
         public async Task GlobalContextSeeds()
         {
-            using var context = new GlobalDynamicContext();
+            using var context = GlobalDynamicContext.New();
             await context.SeedAsync();
         }
 
         [Fact]
         public async Task InternalContextSeeds()
         {
-            using var context = new InternalDynamicContext();
+            using var context = InternalDynamicContext.New();
             await context.SeedAsync();
         }
     }

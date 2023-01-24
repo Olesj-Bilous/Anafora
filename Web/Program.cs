@@ -16,9 +16,8 @@ using AnaforaWeb.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<DataContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DataContextConnection")
-        ?? throw new InvalidOperationException("Connection string 'DataContextConnection' not found.")));
+builder.Services.AddDbContextPool<DataContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DataContextConnection") ?? throw new InvalidOperationException("Connection string 'DataContextConnection' not found.")));
 
 builder.Services.AddIdentityCore<User>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddRoles<Role>()
@@ -27,7 +26,7 @@ builder.Services.AddIdentityCore<User>(options => options.SignIn.RequireConfirme
     .AddDefaultUI();
 
 builder.Services.AddDistributedMemoryCache(); // adds default in-memory cache as IDistributedCache
-builder.Services.AddSingleton<ITicketStore, TicketStore>(); // depends surjectively on IDistributedCache
+builder.Services.AddSingleton<ITicketStore, TicketStore>(); // depends on IDistributedCache
 
 builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)
     .AddIdentityCookies(identity => identity.ApplicationCookie.Configure<ITicketStore>((cookie, store) =>
@@ -52,7 +51,7 @@ var app = builder.Build();
 
 var seeding = app.Services.SeedDataContext("admin@anafora.net",
     // set password in project folder: dotnet user-secrets set anafora-admin-password <password>
-    builder.Configuration.GetValue<string>("anafora-admin-password"));
+    builder.Configuration.GetValue<string>("anafora-admin-password") ?? throw new InvalidOperationException("Admin password not found."));
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsProduction())

@@ -1,10 +1,12 @@
-﻿using AnaforaDataLab.Model.Dynamics.Base;
+﻿using AnaforaDataLab.Context.Dynamics;
+using AnaforaDataLab.Model.Dynamics.Base;
 using Microsoft.EntityFrameworkCore;
 
 namespace AnaforaDataLab.Repository.Dynamics
 {
-    public abstract class DynamicContext<TType, TComponent, TComponentType, TProperty, TValue, TModel, TModelValue, TKey>
+    public abstract class DynamicContext<TSelf, TType, TComponent, TComponentType, TProperty, TValue, TModel, TModelValue, TKey>
         : DbContext
+        where TSelf : DynamicContext<TSelf, TType, TComponent, TComponentType, TProperty, TValue, TModel, TModelValue, TKey>
         where TType : DynamicType<TKey>
         where TComponent : DynamicComponent<TKey>
         where TComponentType : DynamicComponentType<TKey>
@@ -20,6 +22,10 @@ namespace AnaforaDataLab.Repository.Dynamics
             _connectionString = $"Server=localhost;Database=AnaforaDataLab.Dynamics{key[key.LastIndexOf('.')..]};Trusted_Connection=True;MultipleActiveResultSets=true";
         }
 
+        public DynamicContext(DbContextOptions options) : base(options)
+        {
+        }
+
         public DbSet<TType> Types { get; set; }
         public DbSet<TComponent> Components { get; set; }
         public DbSet<TComponentType> ComponentTypes { get; set; }
@@ -28,14 +34,21 @@ namespace AnaforaDataLab.Repository.Dynamics
         public DbSet<TModel> Models { get; set; }
         public DbSet<TModelValue> ModelValues { get; set; }
 
-        private readonly static string _connectionString;
+        public static TSelf New() => (TSelf)Activator.CreateInstance(typeof(TSelf), Options());
+        public static DbContextOptions<TSelf> Options() => new DbContextOptionsBuilder<TSelf>().UseSqlServer(_connectionString).Options;
 
-        protected override void OnConfiguring(DbContextOptionsBuilder builder)
-        {
-            if (!builder.IsConfigured)
-            {
-                builder.UseSqlServer(_connectionString);
-            }
-        }
+        protected readonly static string _connectionString;
+
+        // ! parameterless constructor and options configuration disabled for context pooling !
+        //
+        //public DynamicContext() { }
+        //
+        //protected override void OnConfiguring(DbContextOptionsBuilder builder)
+        //{
+        //    if (!builder.IsConfigured)
+        //    {
+        //        //builder.UseSqlServer(_connectionString);
+        //    }
+        //}
     }
 }

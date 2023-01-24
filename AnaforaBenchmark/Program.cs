@@ -7,7 +7,7 @@ namespace AnaforaBenchmark
     {
         static void Main(string[] args)
         {
-            BenchmarkRunner.Run<IdentityKeyBenchmark>();
+            BenchmarkRunner.Run<GetAll>();
         }
     }
 }

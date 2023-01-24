@@ -8,8 +8,9 @@ namespace AnaforaDataLab.Utils
         private const int seedRange = 3;
         private const int seedMultiplier = 3;
 
-        public static async Task SeedAsync<TType, TComponent, TComponentType, TProperty, TValue, TModel, TModelValue, TKey>(
-            this DynamicContext<TType, TComponent, TComponentType, TProperty, TValue, TModel, TModelValue, TKey> context)
+        public static async Task SeedAsync<TSelf, TType, TComponent, TComponentType, TProperty, TValue, TModel, TModelValue, TKey>(
+            this DynamicContext<TSelf, TType, TComponent, TComponentType, TProperty, TValue, TModel, TModelValue, TKey> context)
+            where TSelf : DynamicContext<TSelf, TType, TComponent, TComponentType, TProperty, TValue, TModel, TModelValue, TKey>
             where TType: DynamicType<TKey>
             where TComponent : DynamicComponent<TKey>
             where TComponentType : DynamicComponentType<TKey>
