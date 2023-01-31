@@ -3,12 +3,16 @@ using AnaforaData.Utils.Dynamics;
 
 namespace AnaforaDataLab.Model.Dynamics.Base
 {
-    public abstract class DynamicModelValue<TKey> : IDataModel<TKey>,
-        IDynamicModelValue<DynamicModel<TKey>, DynamicValue<TKey>, DynamicProperty<TKey>, DynamicComponent<TKey>>
+    public abstract class DynamicModelValue<TModel, TValue, TProperty, TComponent, TKey>
+        : IDataModel<TKey>, IDynamicModelValue<TModel, TValue, TProperty, TComponent>
+        where TModel : DynamicModel<TKey>
+        where TValue : DynamicValue<TComponent, TProperty, TKey>
+        where TProperty : DynamicProperty<TComponent, TKey>
+        where TComponent : DynamicComponent<TKey>
         where TKey : IEquatable<TKey>
     {
         public TKey Id { get; set; }
-        public DynamicModel<TKey> Model { get; set; }
-        public DynamicValue<TKey> Value { get; set; }
+        public TModel Model { get; set; }
+        public TValue Value { get; set; }
     }
 }

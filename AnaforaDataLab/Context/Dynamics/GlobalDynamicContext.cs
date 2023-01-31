@@ -1,5 +1,5 @@
-﻿using AnaforaDataLab.Model.Dynamics;
-using AnaforaDataLab.Repository.Dynamics;
+﻿using AnaforaDataLab.Context.Dynamics.Base;
+using AnaforaDataLab.Model.Dynamics;
 using Microsoft.EntityFrameworkCore;
 
 namespace AnaforaDataLab.Context.Dynamics

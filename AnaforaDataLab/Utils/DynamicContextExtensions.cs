@@ -1,23 +1,23 @@
-﻿using AnaforaDataLab.Model.Dynamics.Base;
-using AnaforaDataLab.Repository.Dynamics;
+﻿using AnaforaDataLab.Context.Dynamics.Base;
+using AnaforaDataLab.Model.Dynamics.Base;
 
 namespace AnaforaDataLab.Utils
 {
     public static class DynamicContextExtensions
     {
-        private const int seedRange = 3;
-        private const int seedMultiplier = 3;
+        private const int seedRange = 2;
+        private const int seedMultiplier = 2;
 
         public static async Task SeedAsync<TSelf, TType, TComponent, TComponentType, TProperty, TValue, TModel, TModelValue, TKey>(
             this DynamicContext<TSelf, TType, TComponent, TComponentType, TProperty, TValue, TModel, TModelValue, TKey> context)
             where TSelf : DynamicContext<TSelf, TType, TComponent, TComponentType, TProperty, TValue, TModel, TModelValue, TKey>
-            where TType: DynamicType<TKey>
+            where TType : DynamicType<TKey>
             where TComponent : DynamicComponent<TKey>
-            where TComponentType : DynamicComponentType<TKey>
-            where TProperty : DynamicProperty<TKey>
-            where TValue : DynamicValue<TKey>
+            where TComponentType : DynamicComponentType<TComponent, TType, TKey>
+            where TProperty : DynamicProperty<TComponent, TKey>
+            where TValue : DynamicValue<TComponent, TProperty, TKey>
             where TModel : DynamicModel<TKey>
-            where TModelValue : DynamicModelValue<TKey>
+            where TModelValue : DynamicModelValue<TModel, TValue, TProperty, TComponent, TKey>
             where TKey : IEquatable<TKey>
         {
             await context.Database.EnsureDeletedAsync();
@@ -55,6 +55,7 @@ namespace AnaforaDataLab.Utils
             for (var i = 0; i < propRange; i++)
             {
                 props[i] = (TProperty)Activator.CreateInstance(typeof(TProperty));
+                props[i].Name = Guid.NewGuid().ToString();
 
                 var current = i * seedMultiplier;
                 for (var j = current; j < current + seedMultiplier; j++)

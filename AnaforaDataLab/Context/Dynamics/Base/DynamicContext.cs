@@ -2,18 +2,18 @@
 using AnaforaDataLab.Model.Dynamics.Base;
 using Microsoft.EntityFrameworkCore;
 
-namespace AnaforaDataLab.Repository.Dynamics
+namespace AnaforaDataLab.Context.Dynamics.Base
 {
     public abstract class DynamicContext<TSelf, TType, TComponent, TComponentType, TProperty, TValue, TModel, TModelValue, TKey>
         : DbContext
         where TSelf : DynamicContext<TSelf, TType, TComponent, TComponentType, TProperty, TValue, TModel, TModelValue, TKey>
         where TType : DynamicType<TKey>
         where TComponent : DynamicComponent<TKey>
-        where TComponentType : DynamicComponentType<TKey>
-        where TProperty : DynamicProperty<TKey>
-        where TValue : DynamicValue<TKey>
+        where TComponentType : DynamicComponentType<TComponent, TType, TKey>
+        where TProperty : DynamicProperty<TComponent, TKey>
+        where TValue : DynamicValue<TComponent, TProperty, TKey>
         where TModel : DynamicModel<TKey>
-        where TModelValue : DynamicModelValue<TKey>
+        where TModelValue : DynamicModelValue<TModel, TValue, TProperty, TComponent, TKey>
         where TKey : IEquatable<TKey>
     {
         static DynamicContext()
