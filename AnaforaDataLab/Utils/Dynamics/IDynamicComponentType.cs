@@ -1,4 +1,4 @@
-﻿namespace AnaforaData.Utils.Dynamics
+﻿namespace AnaforaDataLab.Utils.Dynamics
 {
     public interface IDynamicComponentType<TComponent, TType> where TComponent : IDynamicComponent where TType : IDynamicType
     {

@@ -14,13 +14,14 @@ public static class ServiceExtensions
     {
         await using var scope = services.CreateAsyncScope();
 
-        DataContext context = scope.ServiceProvider.GetRequiredService<DataContext>();
-        await context.Database.MigrateAsync();
-
         IActionDescriptorCollectionProvider provider = scope.ServiceProvider.GetService<IActionDescriptorCollectionProvider>();
         var items = provider.ActionDescriptors.Items; // hook for content authorization policy (in development)
 
         UserManager<User> manager = scope.ServiceProvider.GetService<UserManager<User>>();
+
+        DataContext context = scope.ServiceProvider.GetRequiredService<DataContext>();
+        await context.Database.EnsureDeletedAsync(); // environment is currently assumed to be development
+        await context.Database.EnsureCreatedAsync(); // an implementation with MigrateAsync should be provided for production
         await context.SeedAsync(manager, adminEmail, adminPassword);
     }
 }

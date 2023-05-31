@@ -361,3 +361,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/ProductComposer/dotnet-dev-cert.crt
+/ProductComposer/dotnet-dev-cert.key
