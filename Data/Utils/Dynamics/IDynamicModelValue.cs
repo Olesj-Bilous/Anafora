@@ -1,12 +1,19 @@
-﻿namespace AnaforaData.Utils.Dynamics
+﻿using AnaforaData.Model;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace AnaforaData.Utils.Dynamics
 {
-    public interface IDynamicModelValue<TModel, TValue, TProperty, TComponent>
-        where TModel : IDynamicModel
-        where TValue : IDynamicValue<TProperty, TComponent>
-        where TProperty: IDynamicProperty<TComponent>
-        where TComponent : IDynamicComponent
+    public interface IDynamicModelValue<TKey, TProperty, TValueType, TModel, TValue> : IDataModel<TKey>
+        where TKey : IEquatable<TKey>
+        where TProperty : IDynamicProperty<TKey, TValueType>
+        where TModel : IDynamicModel<TKey>
+        where TValue : IDynamicValue<TKey, TProperty, TValueType>
     {
-        public TModel Model { get; set; }
-        public TValue Value { get; set; }
+        TModel Model { get; set; }
+        TValue Value { get; set; }
     }
 }

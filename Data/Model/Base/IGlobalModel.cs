@@ -1,6 +1,4 @@
-﻿using AnaforaData.Model.Base;
-
-namespace AnaforaData.Model
+﻿namespace AnaforaData.Model
 {
     public interface IGlobalModel : IDataModel<Guid>
     {

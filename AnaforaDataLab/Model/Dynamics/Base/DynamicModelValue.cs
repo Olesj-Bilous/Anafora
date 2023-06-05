@@ -1,5 +1,5 @@
-﻿using AnaforaData.Model.Base;
-using AnaforaData.Utils.Dynamics;
+﻿using AnaforaData.Model;
+using AnaforaDataLab.Utils.Dynamics;
 
 namespace AnaforaDataLab.Model.Dynamics.Base
 {
