@@ -28,6 +28,8 @@ builder.Services.AddIdentityCore<User>(options => options.SignIn.RequireConfirme
 builder.Services.AddDistributedMemoryCache(); // adds default in-memory cache as IDistributedCache
 builder.Services.AddSingleton<ITicketStore, TicketStore>(); // depends on IDistributedCache
 
+builder.Services.AddCors(options => options.AddPolicy("DefaultCorsPolicy", builder => builder.SetIsOriginAllowed(origin => origin == "https://localhost:3000")));
+
 builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)
     .AddIdentityCookies(identity => identity.ApplicationCookie.Configure<ITicketStore>((cookie, store) =>
     {
@@ -38,8 +40,6 @@ builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)
 
 builder.Services.AddSingleton<IAuthorizationHandler, ContentAuthorizationHandler>();
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, ContentPolicyProvider>();
-
-builder.Services.AddCors(options => options.AddPolicy("DefaultCorsPolicy", builder => builder.SetIsOriginAllowed(origin => origin == "https://localhost:3000")));
 
 builder.Services.AddAuthorization(options =>
 {
@@ -52,7 +52,7 @@ builder.Services.AddControllers();
 var app = builder.Build();
 
 var seeding = app.Services.SeedDataContext("admin@anafora.net",
-    // set password in project root folder: dotnet user-secrets set anafora-admin-password <password>
+    // set password in project root dir: dotnet user-secrets set anafora-admin-password <password>
     builder.Configuration.GetValue<string>("anafora-admin-password") ?? throw new InvalidOperationException("Admin password not found."));
 
 // Configure the HTTP request pipeline.

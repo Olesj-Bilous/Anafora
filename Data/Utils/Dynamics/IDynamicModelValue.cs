@@ -11,7 +11,7 @@ namespace AnaforaData.Utils.Dynamics
         where TKey : IEquatable<TKey>
         where TProperty : IDynamicProperty<TKey, TValueType>
         where TModel : IDynamicModel<TKey>
-        where TValue : IDynamicValue<TKey, TProperty, TValueType>
+        where TValue : IDynamicValue<TKey, TValueType, TProperty>
     {
         TModel Model { get; set; }
         TValue Value { get; set; }
