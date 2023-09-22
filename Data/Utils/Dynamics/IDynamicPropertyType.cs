@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace AnaforaData.Utils.Dynamics
 {
-    public interface IDynamicPropertyType<TKey, TValueType, TProperty, TType> : IDataModel<TKey>
+    public interface IDynamicPropertyType<TKey, TValue, TProperty, TType> : IDataModel<TKey>
         where TKey : IEquatable<TKey>
-        where TProperty : IDynamicProperty<TKey, TValueType>
+        where TProperty : IDynamicProperty<TKey, TValue>
         where TType : IDynamicType<TKey>
     {
         TProperty Property { get; set; }

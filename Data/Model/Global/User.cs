@@ -2,7 +2,7 @@
 
 namespace AnaforaData.Model
 {
-    public class User : IdentityUser<Guid>
+    public class User : IdentityUser<Guid>, IGlobalModel
     {
         //public ICollection<IdentityUserClaim<Guid>> Claims { get; set; }
         //public ICollection<IdentityUserLogin<Guid>> Logins { get; set; }

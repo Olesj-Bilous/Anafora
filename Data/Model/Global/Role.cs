@@ -2,7 +2,7 @@
 
 namespace AnaforaData.Model
 {
-    public class Role : IdentityRole<Guid>
+    public class Role : IdentityRole<Guid>, IGlobalModel
     {
         //public ICollection<RolePermission> Permissions { get; set; }
     }

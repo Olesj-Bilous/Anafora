@@ -7,9 +7,10 @@ using System.Threading.Tasks;
 
 namespace AnaforaData.Model.Global.Product
 {
-    public class ProductStringValue : IDynamicValue<Guid, ProductStringProperty, string>
+    public class ProductStringValue : IDynamicValue<Guid, string, ProductStringProperty>
     {
         public Guid Id { get; set; }
         public string Value { get; set; }
+        public ProductStringProperty Property { get; set; }
     }
 }
