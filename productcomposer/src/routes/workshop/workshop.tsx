@@ -1,13 +1,15 @@
-import React from 'react';
-import { Link, Outlet } from 'react-router-dom';
-
-export function Component() { return Workshop(); }
+import { NavLink, Outlet } from 'react-router-dom';
 
 function Workshop() {
-    return (<>
-        <p>Let's get to work!</p>
-        <Link to='types'>Types</Link>
-        <Outlet />
-    </>
-    );
+  return (<>
+    <p>Let's get to work!</p>
+    <nav>
+      <NavLink to='types'>Types</NavLink>
+      <NavLink to='properties'>Properties</NavLink>
+    </nav>
+    <Outlet />
+  </>
+  );
 }
+
+export { Workshop as Component }

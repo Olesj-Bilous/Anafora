@@ -23,5 +23,26 @@ namespace AnaforaWeb.Controllers
         {
             return _context.Set<ProductType>().ToList();
         }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public List<ProductStringProperty> Properties()
+        {
+            return _context.Set<ProductStringProperty>().ToList();
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public ProductStringProperty Property(Guid id)
+        {
+            return _context.Set<ProductStringProperty>().Find(id);
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public List<ProductStringValue> Values(Guid propertyId)
+        {
+            return _context.Set<ProductStringValue>().Where(value => value.Property.Id == propertyId).ToList();
+        }
     }
 }

@@ -8,15 +8,15 @@ export interface RouteFunctionArgs<P extends string = string> {
 
 export default function buildRouteQuery(queryClient: QueryClient) {
   return {
-    deriveQueryKey<K extends QueryKey = QueryKey, P extends string = string>(deriver: (args: RouteFunctionArgs<P>) => K) {
+    setQueryFn<K extends QueryKey = QueryKey, T = unknown, P = any>(queryFn: QueryFunction<T, K, P>) {
       return {
-        setQueryFn<T, Q = any>(queryFn: QueryFunction<T, K, Q>): {
+        deriveQueryKey<Q extends string = string>(deriver: (args: RouteFunctionArgs<Q>) => K): {
           loader: LoaderFunction
         } {
           return {
             async loader(args) {
               const queryKey = deriver(args)
-              return await queryClient.getQueryData(queryKey) ?? queryClient.fetchQuery({ queryKey, queryFn })
+              return queryClient.getQueryData(queryKey) ?? await queryClient.fetchQuery({ queryKey, queryFn })
             }
           }
         }
@@ -24,3 +24,12 @@ export default function buildRouteQuery(queryClient: QueryClient) {
     }
   }
 }
+
+/*export function composeLoaders(loaders: Record<string, LoaderFunction>): LoaderFunction {
+  return (args) => {
+    const response = {}
+    for (const key in loaders) {
+      response[key] = 
+    }
+  }
+}*/
