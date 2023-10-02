@@ -13,6 +13,16 @@ namespace AnaforaWeb.Controllers
         public TypeController(DataContext context) : base(context)
         {
         }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public List<ProductStringProperty> Properties(Guid id)
+        {
+            return _context.Set<ProductStringPropertyType>()
+                .Where(propType => propType.Type.Id == id)
+                .Select(propType => propType.Property)
+                .ToList();
+        }
     }
 
     public class PropertyController : ModelController<ProductStringProperty>
@@ -21,6 +31,8 @@ namespace AnaforaWeb.Controllers
         {
         }
 
+        [AllowAnonymous]
+        [HttpGet]
         public List<ProductStringValue> Values(Guid id)
         {
             return _context.Set<ProductStringValue>().Where(value => value.Property.Id == id).ToList();

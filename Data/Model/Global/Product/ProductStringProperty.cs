@@ -11,5 +11,6 @@ namespace AnaforaData.Model.Global.Product
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
+        public ICollection<ProductStringPropertyType> Types { get; set; }
     }
 }
