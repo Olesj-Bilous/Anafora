@@ -11,7 +11,7 @@ export default async function remote(
   const response = await fetch(url, {
     method,
     headers,
-    body
+    body: body && JSON.stringify(body)
   })
-  return response.json()
+  return method === 'GET' ? response.json() : response.ok
 }

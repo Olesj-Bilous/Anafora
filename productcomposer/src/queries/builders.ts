@@ -1,7 +1,7 @@
 import { ObjectSchema } from "yup"
 import { remoteArray, remoteObject } from "../utils/castRemoteData"
 import remote from "./remote"
-import setQueryFn, { Mutor } from "../utils/setQueryFn"
+import { setQueryFn, Mutor } from "../utils/setQueryFn"
 
 export type AllKey = [model: string]
 
@@ -37,7 +37,12 @@ export type AddOrUpdateKey = [model: string, action: 'add' | 'update']
 
 export function buildAddOrUpdate(mutor: Mutor) {
   const builder = mutor.deriveMutationFn(
-    ([model,action]: AddOrUpdateKey) => (t) => remote(`/${model}/${action}`, action === 'add' ? 'POST' : 'PUT', t)
+    ([model, action]: AddOrUpdateKey) => ({
+      mutationFn: (t) => remote(`/${model}/${action}`, action === 'add' ? 'POST' : 'PUT', t),
+      queryKeys: (vars) => ({
+        get: [model, vars && typeof vars === 'object' && 'id' in vars ? vars.id : 'hopefully never' ]
+      })
+    })
   )
   return <T>(model: string) => ({
     add: builder.setMutationKey<T>([model, 'add']),
@@ -47,9 +52,12 @@ export function buildAddOrUpdate(mutor: Mutor) {
 
 export type RemoveKey = [model: string, action: 'remove']
 
-export function buildRemove(mutor: Mutor) {
+export function remove(mutor: Mutor) {
   const builder = mutor.deriveMutationFn<RemoveKey, string>(
-    ([model]) => id => remote(`/${model}/remove?id=${id}}`, 'DELETE')
+    ([model]) => ({ mutationFn: id => remote(`/${model}/remove?id=${id}}`, 'DELETE') })
   )
   return (model: string) => builder.setMutationKey([model, 'remove'])
 }
+
+export type AddOrRemoveKey = [model: string, relation: string, action: 'add' | 'remove']
+

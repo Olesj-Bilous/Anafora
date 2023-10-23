@@ -31,7 +31,8 @@ builder.Services.AddIdentityCore<User>(options => options.SignIn.RequireConfirme
 builder.Services.AddDistributedMemoryCache(); // adds default in-memory cache as IDistributedCache
 builder.Services.AddSingleton<ITicketStore, TicketStore>(); // depends on IDistributedCache
 
-builder.Services.AddCors(options => options.AddPolicy("DefaultCorsPolicy", builder => builder.SetIsOriginAllowed(origin => origin == "https://localhost:3000")));
+builder.Services.AddCors(options => options.AddPolicy(
+    "DefaultCorsPolicy", builder => builder.SetIsOriginAllowed(origin => origin == "https://localhost:3000").AllowAnyMethod().AllowAnyHeader()));
 
 builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)
     .AddIdentityCookies(identity => identity.ApplicationCookie.Configure<ITicketStore>((cookie, store) =>

@@ -1,6 +1,7 @@
 ﻿using AnaforaData.Context;
 using AnaforaData.Model;
 using AnaforaData.Model.Global.Product;
+using AnaforaData.Utils.Extensions;
 using AnaforaWeb.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -41,6 +42,13 @@ namespace AnaforaWeb.Controllers
         }
     }
 
+    public class ValueController : ModelController<ProductStringValue>
+    {
+        public ValueController(DataContext context) : base(context)
+        {
+        }
+    }
+
     [Route("api/[controller]/[action]")]
     [ApiController]
     public abstract class ModelController<T> : ControllerBase where T : class, IDataModel<Guid>
@@ -65,9 +73,9 @@ namespace AnaforaWeb.Controllers
         //[ContentAuthorize(_type, AnaforaData.Utils.Enums.Permissions.Read)]
         [AllowAnonymous]
         [HttpGet]
-        public async Task<ActionResult<T>> Get(Guid guid)
+        public async Task<ActionResult<T>> Get(Guid id)
         {
-            var model = await _context.Set<T>().FindAsync(guid);
+            var model = await _context.Set<T>().FindAsync(id);
             if (model == null) return NotFound();
             return Ok(model);
         }
@@ -100,11 +108,18 @@ namespace AnaforaWeb.Controllers
             if (model == null) return NotFound();
             foreach (var prop in typeof(T).GetProperties())
             {
+                if (prop.Name == "Id") continue;
+
+                if (prop.PropertyType.IsRelation() || prop.PropertyType.IsDataModel()) continue;
+
                 var attributes = prop.GetCustomAttributes(typeof(ValidationAttribute), true);
+
                 var newValue = prop.GetValue(model);
                 if (attributes.Any(a => a.GetType() == typeof(RequiredAttribute)) && newValue == null) return BadRequest();
+
                 prop.SetValue(oldModel, newValue);
             }
+            await _context.SaveChangesAsync();
             
             return Ok();
         }

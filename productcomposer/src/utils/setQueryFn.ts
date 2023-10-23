@@ -11,7 +11,7 @@ export interface QueryControl<T = unknown, Pm extends string = string> {
   useQuery: (params: Params<Pm>) => UseQueryResult<T>
 }
 
-export default function setQueryFn<K extends QueryKey = QueryKey, T = unknown, Pg = any>(
+export function setQueryFn<K extends QueryKey = QueryKey, T = unknown, Pg = any>(
   queryFn: QueryFunction<T, K, Pg>
 ) {
   return {
@@ -32,24 +32,36 @@ export default function setQueryFn<K extends QueryKey = QueryKey, T = unknown, P
 }
 
 export interface Mutor {
-  deriveMutationFn: <M extends MutationKey, T = any>(
-    deriver: <S extends T = T>(m: M) => MutationFunction<Response, S>
-  ) => {
-    setMutationKey: <Tx extends T = T>(key: M) => {
-      useMutation: () => UseMutationResult<Response, unknown, Tx>
+  deriveMutationFn<M extends MutationKey, T = any>(
+    deriver: <S extends T = T>(m: M) => {
+      mutationFn: MutationFunction<Response, S>,
+      queryKeys?: (vars: S) => { [key: string]: QueryKey }
+    }
+  ): {
+    setMutationKey<Tx extends T = T>(key: M): {
+      useMutation(): UseMutationResult<Response, unknown, Tx>
     }
   }
 }
 
 export const createMutor = (client: QueryClient): Mutor => ({
-  deriveMutationFn<M extends MutationKey, T = any>(
-    deriver: <S extends T = T>(m: M) => MutationFunction<Response, S>
+  deriveMutationFn(
+    deriver
   ) {
     return {
-      setMutationKey<Tx extends T = T>(key: M) {
-        client.setMutationDefaults(key, { mutationFn: deriver(key) })
+      setMutationKey(key) {
+        const { mutationFn, queryKeys } = deriver(key)
+        client.setMutationDefaults(key, {
+          mutationFn, onSuccess(data, variables) {
+            const keys = queryKeys && queryKeys(variables)
+            if (queryKeys)
+            for (const key in keys) {
+              client.invalidateQueries(keys[key])
+            }
+          }
+        })
         return {
-          useMutation: () => useMutation<Response, unknown, Tx>({ mutationKey: key })
+          useMutation: () => useMutation({ mutationKey: key })
         }
       }
     }

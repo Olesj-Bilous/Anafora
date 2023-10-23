@@ -1,5 +1,6 @@
 ﻿using AnaforaData.Model;
 using AnaforaData.Model.Global.Product;
+using AnaforaData.Utils.Extensions;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
@@ -17,12 +18,7 @@ namespace AnaforaData.Context
         {
             base.OnModelCreating(builder); // applies base AspNetCore Identity configuration, should always be called first
 
-            var types = Assembly.GetExecutingAssembly().GetExportedTypes().Where(type
-                => type.IsClass
-                && type.GetInterfaces()
-                    .Where(iface => iface.IsGenericType)
-                    .Select(iface => iface.GetGenericTypeDefinition())
-                    .Contains(typeof(IDataModel<>)));
+            var types = Assembly.GetExecutingAssembly().GetExportedTypes().Where(type => type.IsDataModel()) ;
             foreach (var type in types)
             {
                 builder.Entity(type);
