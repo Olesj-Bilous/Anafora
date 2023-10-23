@@ -1,20 +1,9 @@
-import { NavLink, Outlet } from "react-router-dom"
-import { allTypeQueries } from "../.."
-import { useState } from "react"
+import { allProperties } from "../../queries/queries"
+import { Property } from "../../components/Property"
 
 function Properties() {
-  const properties = allTypeQueries.useLoaderData()
-  const [focus, setFocus] = useState(0)
-  return <>
-    <ul>
-      {
-        properties.map(({ id, name }, i) => <li key={i}>
-          <NavLink to={`/workshop/properties/${id}`} onClick={() => setFocus(i)}>{name}</NavLink>
-          {focus === i && <Outlet />}
-        </li>)
-      }
-    </ul>
-  </>
+  const properties = allProperties.useLoaderData()
+  return <ul>{properties.map(prop => <li><Property {...prop} /></li>)}</ul>
 }
 
 export { Properties as Component }

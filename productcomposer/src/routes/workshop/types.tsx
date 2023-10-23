@@ -1,9 +1,8 @@
-import { useLoaderData } from 'react-router-dom';
-import { allTypeQueries } from '../..';
+import { allTypes } from '../../queries/queries';
 import Type from '../../components/Type';
 
 function Types() {
-  const types = useLoaderData() as Type[]
+  const types = allTypes.useLoaderData()
 
   return (<ul>{
     types.length

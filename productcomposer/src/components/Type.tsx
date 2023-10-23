@@ -1,11 +1,11 @@
-import { typePropertyQueries } from "..";
+import { typeProperties } from "../queries/queries";
 import { Property } from "./Property";
 
 
 export default function Type({ id, name }: Type) {
-  const {data:properties, isLoading} = typePropertyQueries.useQuery({ id })
+  const { data: properties, isLoading } = typeProperties.useQuery({ id })
   return <>
     <h3>{name}</h3>
-    {!isLoading && properties && properties.map((prop => <Property {...prop} />))}
+    {isLoading ? 'loading' : properties && <ul>{properties.map(prop => <li><Property {...prop} /></li>)}</ul>}
   </>
 }

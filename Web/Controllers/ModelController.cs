@@ -5,6 +5,8 @@ using AnaforaWeb.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace AnaforaWeb.Controllers
 {
@@ -54,17 +56,57 @@ namespace AnaforaWeb.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        public List<T> All()
+        public async Task<ActionResult<List<T>>> All()
         {
-            return _context.Set<T>().ToList();
+            var all = await _context.Set<T>().ToListAsync();
+            return Ok(all);
         }
 
         //[ContentAuthorize(_type, AnaforaData.Utils.Enums.Permissions.Read)]
         [AllowAnonymous]
         [HttpGet]
-        public T Get(Guid guid)
+        public async Task<ActionResult<T>> Get(Guid guid)
         {
-            return _context.Set<T>().Find(guid);
+            var model = await _context.Set<T>().FindAsync(guid);
+            if (model == null) return NotFound();
+            return Ok(model);
+        }
+
+        [AllowAnonymous]
+        [HttpDelete]
+        public async Task<ActionResult> Remove(Guid guid)
+        {
+            var model = await _context.Set<T>().FindAsync(guid);
+            if (model == null) return NotFound();
+            _context.Set<T>().Remove(model);
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<ActionResult> Add([FromBody] T model)
+        {
+            await _context.AddRangeAsync(model);
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
+        [AllowAnonymous]
+        [HttpPut]
+        public async Task<ActionResult> Update([FromBody] T model)
+        {
+            var oldModel = await _context.Set<T>().FindAsync(model.Id);
+            if (model == null) return NotFound();
+            foreach (var prop in typeof(T).GetProperties())
+            {
+                var attributes = prop.GetCustomAttributes(typeof(ValidationAttribute), true);
+                var newValue = prop.GetValue(model);
+                if (attributes.Any(a => a.GetType() == typeof(RequiredAttribute)) && newValue == null) return BadRequest();
+                prop.SetValue(oldModel, newValue);
+            }
+            
+            return Ok();
         }
     }
 }
