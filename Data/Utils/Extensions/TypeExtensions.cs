@@ -15,22 +15,29 @@ namespace AnaforaData.Utils.Extensions
                 && type.HasGenericInterface(typeof(IDataModel<>));
         }
 
-        public static bool IsRelation(this Type type)
+        public static bool IsDataRelation(this Type type)
         {
             return type.IsIEnumerable(typeof(IDataModel<>));
         }
 
         public static bool IsIEnumerable(this Type type, Type? item)
         {
-            return type.HasGenericInterface(typeof(IEnumerable<>)) && (item == null || (type.GenericTypeArguments.FirstOrDefault()?.IsAssignableTo(item) ?? false));
+            return type.HasGenericInterface(typeof(IEnumerable<>))
+                && (
+                    item == null
+                    || (
+                        type.GenericTypeArguments.FirstOrDefault()?.IsAssignableTo(item)
+                        ?? false
+                    )
+                );
         }
 
         public static bool HasGenericInterface(this Type type, Type iface)
         {
             return type.GetInterfaces()
-                    .Where(iface => iface.IsGenericType)
-                    .Select(iface => iface.GetGenericTypeDefinition())
-                    .Contains(iface);
+                .Where(iface => iface.IsGenericType)
+                .Select(iface => iface.GetGenericTypeDefinition())
+                .Contains(iface);
         }
     }
 }

@@ -19,6 +19,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EditorConfigFiles Remove="C:\Users\olesj\source\repos\Anafora\Data\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="C:\Users\olesj\source\repos\Anafora\Data\.editorconfig" />
   </ItemGroup>
 
 </Project>

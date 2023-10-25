@@ -30,4 +30,12 @@
     <Folder Include="Utils\Enums\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EditorConfigFiles Remove="C:\Users\olesj\source\repos\Anafora\Web\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="C:\Users\olesj\source\repos\Anafora\Web\.editorconfig" />
+  </ItemGroup>
+
 </Project>

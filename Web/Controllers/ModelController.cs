@@ -110,7 +110,7 @@ namespace AnaforaWeb.Controllers
             {
                 if (prop.Name == "Id") continue;
 
-                if (prop.PropertyType.IsRelation() || prop.PropertyType.IsDataModel()) continue;
+                if (prop.PropertyType.IsDataRelation() || prop.PropertyType.IsDataModel()) continue;
 
                 var attributes = prop.GetCustomAttributes(typeof(ValidationAttribute), true);
 
@@ -120,7 +120,7 @@ namespace AnaforaWeb.Controllers
                 prop.SetValue(oldModel, newValue);
             }
             await _context.SaveChangesAsync();
-            
+
             return Ok();
         }
     }
