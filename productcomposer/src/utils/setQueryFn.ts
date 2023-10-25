@@ -15,7 +15,9 @@ export function setQueryFn<K extends QueryKey = QueryKey, T = unknown, Pg = any>
   queryFn: QueryFunction<T, K, Pg>
 ) {
   return {
-    deriveQueryKey<Pm extends string = string>(deriver: (params: Params<Pm>) => K): QueryControl<T, Pm> {
+    deriveQueryKey<Pm extends string = string>(
+      deriver: (params: Params<Pm>) => K
+    ): QueryControl<T, Pm> {
       return {
         loader: client => async ({ params }) => {
           const queryKey = deriver(params)
@@ -31,12 +33,18 @@ export function setQueryFn<K extends QueryKey = QueryKey, T = unknown, Pg = any>
   }
 }
 
+export interface MutationConfig<S> {
+  mutationFn: MutationFunction<Response, S>
+  queryKeys?: (vars: S) => Record<string, QueryKey>
+}
+
+export interface MutationDeriver<M extends MutationKey, T> {
+  <U extends T>(mutationKey: M): MutationConfig<U>
+}
+
 export interface Mutor {
-  deriveMutationFn<M extends MutationKey, T = any>(
-    deriver: <S extends T = T>(m: M) => {
-      mutationFn: MutationFunction<Response, S>,
-      queryKeys?: (vars: S) => { [key: string]: QueryKey }
-    }
+  deriveMutation<M extends MutationKey, T = any>(
+    deriver: MutationDeriver<M, T>
   ): {
     setMutationKey<Tx extends T = T>(key: M): {
       useMutation(): UseMutationResult<Response, unknown, Tx>
@@ -45,7 +53,7 @@ export interface Mutor {
 }
 
 export const createMutor = (client: QueryClient): Mutor => ({
-  deriveMutationFn(
+  deriveMutation(
     deriver
   ) {
     return {
