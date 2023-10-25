@@ -59,9 +59,10 @@ namespace AnaforaWeb.Controllers
                     SigningCredentials = new SigningCredentials(
                         parameters.IssuerSigningKey,
                         SecurityAlgorithms.HmacSha512Signature
-                    )
+                    ),
+                    Expires = DateTime.UtcNow.AddMinutes(20)
                 };
-                return Ok();
+                return Ok(_jwtHandler.WriteToken(_jwtHandler.CreateToken(token)));
             }
             return Unauthorized();
         }
