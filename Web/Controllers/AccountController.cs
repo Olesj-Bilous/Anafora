@@ -10,6 +10,7 @@ using System.Security.Claims;
 
 namespace AnaforaWeb.Controllers
 {
+    [Route("api/[controller]/[action]")]
     public class AccountController : ControllerBase
     {
         public AccountController(
