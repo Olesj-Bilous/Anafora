@@ -1,5 +1,6 @@
 ﻿using AnaforaData.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -42,16 +43,16 @@ namespace AnaforaWeb.Controllers
             public string Password { get; set; } = string.Empty;
         }
 
-
+        [AllowAnonymous]
         public async Task<IActionResult> SignIn([FromBody] SignInModel signIn)
         {
             var user = await _userManager.FindByEmailAsync(signIn.Email);
             if (user == null) return Unauthorized();
-            var result = await _signInManager.PasswordSignInAsync(user, signIn.Password, false, false);
-            if (result.Succeeded)
+            var valid = await _userManager.CheckPasswordAsync(user, signIn.Password);
+            if (valid)
             {
                 if (User.Identity == null) throw new Exception("User had no identity!");
-                var parameters = _jwtOptions.CurrentValue.TokenValidationParameters;
+                var parameters = _jwtOptions.Get(JwtBearerDefaults.AuthenticationScheme).TokenValidationParameters;
                 var token = new SecurityTokenDescriptor()
                 {
                     Subject = (ClaimsIdentity)User.Identity,

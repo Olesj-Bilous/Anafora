@@ -1,6 +1,6 @@
 import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, LoaderFunctionArgs, redirect } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import './index.css';
 import Root from './routes/root';
@@ -8,6 +8,7 @@ import ErrorPage from './routes/error-page';
 import Storefront from './routes/storefront/storefront';
 import { allProperties, allTypes } from './queries/queries';
 import { createMutor } from './utils/setQueryFn';
+import remote from './queries/remote';
 
 const queryClient = new QueryClient()
 
@@ -30,7 +31,12 @@ const router = createBrowserRouter([{
       lazy: () => import('./routes/workshop/properties')
     }, {
       path: 'signin',
-      lazy: () => import('./routes/workshop/signin')
+      lazy: () => import('./routes/workshop/signin'),
+      async action({ request }) {
+        const data = await request.formData()
+        const email = data.get('email'), password = data.get('password')
+        return remote('/account/signin', 'POST', { email, password })
+      }
     }]
   }, {
     path: 'storefront',

@@ -1,26 +1,28 @@
 import { Form } from "../../components/editable/Form"
 import { useEditor } from 'reactive-editable'
-import { SignInModel, useSignIn } from "../../queries/builders"
+import { SignInModel, useSignInAlt } from "../../queries/builders"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { revert, save } from "../../components/editable/icons"
 
 function SignIn() {
-  const { loading, error, signIn } = useSignIn()
-  const { property, ...cfg } = useEditor<SignInModel>([{
-    email: '',
-    password: ''
-  }, signIn])
-  const [email, setEmail] = property('email')
-  const [password, setPassword] = property('password')
+  const { loading, error, Fetcher } = useSignInAlt()
 
-  return <Form isValid={true} {...cfg}>
+  return <Fetcher method="post">
     <div className="form-status">
       {loading && 'loading'}
       {error && error.message}
     </div>
     <label htmlFor='email'>email</label>
-    <input id='email' type='text' value={email} onChange={({ target: { value } }) => setEmail(value)} />
+    <input id='email' type='email' name="email" />
     <label htmlFor='password'>password</label>
-    <input id='password' type='text' value={password} onChange={({ target: { value } }) => setPassword(value)} />
-  </Form>
+    <input id='password' type='password' name="password" />
+    <button type="submit">
+      <FontAwesomeIcon icon={save} />
+    </button>
+    <button type="reset">
+      <FontAwesomeIcon icon={revert} />
+    </button>
+  </Fetcher>
 }
 
 export { SignIn as Component }

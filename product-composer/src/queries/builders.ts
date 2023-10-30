@@ -1,9 +1,10 @@
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import { ObjectSchema } from "yup"
 import { remoteArray, remoteObject } from "../utils/castRemoteData"
 import remote from "./remote"
 import { setQueryFn, Mutor } from "../utils/setQueryFn"
-import { redirect } from "react-router-dom"
+import { redirect, useFetcher } from "react-router-dom"
+import { Settable } from "reactive-editable"
 
 export type AllKey = [model: string]
 
@@ -59,6 +60,23 @@ export function useSignIn() {
       }
     }, []),
     loading, error
+  }
+}
+
+export function useSignInAlt() {
+  const { state, data, Form } = useFetcher<Response>()
+  const [error, setError] = useState<Error>()
+  useEffect(() => {
+    if (!data) return
+    if (data?.ok) 
+      redirect('/')
+    else
+      setError(new Error(data?.statusText))
+  }, [data])
+  return {
+    loading: state === 'idle',
+    error,
+    Fetcher: Form
   }
 }
 

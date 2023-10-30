@@ -535,6 +535,13 @@
   resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.14.tgz#74a97a5573980802f32c8e47b663530ab3b6b7d1"
   integrity sha512-U3PUjAudAdJBeC2pgN8uTIKgxrb4nlDF3SF0++EldXQvQBGkpFZMSnwQiIoDU77tv45VgNkl/L4ouD+rEomujw==
 
+"@types/node@^20.8.9":
+  version "20.8.9"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.8.9.tgz#646390b4fab269abce59c308fc286dcd818a2b08"
+  integrity sha512-UzykFsT3FhHb1h7yD4CA4YhBHq545JC0YnEz41xkipN88eKQtL6rSgocL5tbAP6Ola9Izm/Aw4Ora8He4x0BHg==
+  dependencies:
+    undici-types "~5.26.4"
+
 "@types/parse-json@^4.0.0":
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.1.tgz#27f7559836ad796cea31acb63163b203756a5b4e"
@@ -1585,10 +1592,10 @@ react@^18.2.0:
   dependencies:
     loose-envify "^1.1.0"
 
-reactive-editable@^0.0.6:
-  version "0.0.6"
-  resolved "https://registry.yarnpkg.com/reactive-editable/-/reactive-editable-0.0.6.tgz#444c7e8f6beb20c63631bee453aa3de2caf94c9d"
-  integrity sha512-mewdHvATyXuIFhcbYjZC10ZgKcglsa+wQUvORiMJfIXSf+qfjQuycv+65b4PLGnrZqDjuNxvWKuMpdqVg3C2rw==
+reactive-editable@0.0.7:
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/reactive-editable/-/reactive-editable-0.0.7.tgz#97a1178cffd752bcdc079b7266217b651f65e0f1"
+  integrity sha512-jdrUq/VONvfAYz3PwgspC25dFddWqV6GKO6DWcz2LWhEYko/31QQZ8CDLcmKg5hZCMC3f4dgt9K5Jz9RF7z9Yg==
   dependencies:
     define-context "^5.1.1"
     react "^18.2.0"
@@ -1763,6 +1770,11 @@ typescript@^5.0.2:
   version "5.2.2"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.2.2.tgz#5ebb5e5a5b75f085f22bc3f8460fba308310fa78"
   integrity sha512-mI4WrpHsbCIcwT9cF4FZvr80QUeKvsUsUvKDoR+X/7XHQH98xYD8YHZg7ANtz2GtZt/CBq2QJ0thkGJMHfqc1w==
+
+undici-types@~5.26.4:
+  version "5.26.5"
+  resolved "https://registry.yarnpkg.com/undici-types/-/undici-types-5.26.5.tgz#bcd539893d00b56e964fd2657a4866b221a65617"
+  integrity sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==
 
 update-browserslist-db@^1.0.13:
   version "1.0.13"

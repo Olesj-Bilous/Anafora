@@ -4,6 +4,7 @@ using AnaforaWeb.Authorization;
 using AnaforaWeb.Utils;
 using AnaforaWeb.Utils.Extensions;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -25,7 +26,9 @@ if (clientPort != null) allowedOrigin += $":{clientPort}";
 
 builder.Services.AddCors(options => options.AddPolicy(
     "DefaultCorsPolicy",
-    policy => policy.SetIsOriginAllowed(origin => origin == allowedOrigin)
+    policy => policy.SetIsOriginAllowed(
+        origin => origin == $"https://{allowedOrigin}"
+        )
         .AllowAnyMethod()
         .AllowAnyHeader()
         .AllowCredentials()
@@ -37,6 +40,7 @@ builder.Services.AddSession();
 builder.Services.AddIdentityCore<User>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddRoles<Role>()
     .AddEntityFrameworkStores<DataContext>()
+    .AddSignInManager<SignInManager<User>>()
     .AddDefaultTokenProviders();
 
 builder.Services.AddDistributedMemoryCache(); // adds default in-memory cache as IDistributedCache
@@ -44,21 +48,24 @@ builder.Services.AddSingleton<ITicketStore, TicketStore>(); // depends on IDistr
 
 builder.Services.AddSingleton<JwtSecurityTokenHandler>();
 
-builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)
-    .AddJwtBearer(options => options.TokenValidationParameters = new()
-    {
-        ValidIssuer = builder.Configuration["profiles:Web:applicationUrl"].Split(';').First(), // https should come first
-        ValidAudience = allowedOrigin,
-        IssuerSigningKey = new SymmetricSecurityKey(
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options => options.TokenValidationParameters = new()
+{
+    ValidIssuer = "https://localhost:7166", // https should come first
+    ValidAudience = allowedOrigin,
+    IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(
                 builder.Configuration["Jwt:Key"]
             )
         ),
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateIssuerSigningKey = true,
-        ValidateLifetime = true
-    });
+    ValidateIssuer = true,
+    ValidateAudience = true,
+    ValidateIssuerSigningKey = true,
+    ValidateLifetime = true
+});
 
 builder.Services.AddSingleton<IAuthorizationHandler, ContentAuthorizationHandler>();
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, ContentPolicyProvider>();

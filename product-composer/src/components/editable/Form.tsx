@@ -1,17 +1,13 @@
 import { ReactNode } from 'react';
-import { Editable, EditPermissionContext } from "reactive-editable";
-import { Save, Revert } from './Buttons';
+import { Editable, EditConfig, EditPermissionContext } from "reactive-editable";
+import { Revert, Save } from './Buttons';
 
-export interface FormConfig {
-  isTouched: boolean
-  isValid: boolean
-  save(): void
-  revert(): void
+export interface FormConfig extends Omit<EditConfig, 'mode' | 'editToggled' | 'remove'> {
 }
 
-export function Form({ children, ...cgf }: { children?: ReactNode } & FormConfig) {
-  return <EditPermissionContext.Provider value={true}><Editable {...cgf}>
-    <form>
+export function Form({ children, ...cfg }: { children?: ReactNode } & FormConfig) {
+  return <EditPermissionContext.Provider value={true}>
+    <Editable {...cfg}>
       <div className='form-body'>
         {children}
       </div>
@@ -19,6 +15,6 @@ export function Form({ children, ...cgf }: { children?: ReactNode } & FormConfig
         <Save />
         <Revert />
       </div>
-    </form>
-  </Editable></EditPermissionContext.Provider> 
+    </Editable>
+  </EditPermissionContext.Provider>
 }

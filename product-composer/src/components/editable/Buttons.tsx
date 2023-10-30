@@ -1,9 +1,6 @@
-import { icon } from '@fortawesome/fontawesome-svg-core/import.macro'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Save as SaveBase, Revert as RevertBase } from 'reactive-editable'
-
-const save = icon({ name: "check" }),
-  revert = icon({ name: "undo" })
+import { save, revert } from './icons'
 
 export function Save() {
   return <SaveBase>
