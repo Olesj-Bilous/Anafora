@@ -5,42 +5,18 @@ using AnaforaWeb.Authorization;
 using AnaforaWeb.Utils;
 using AnaforaWeb.Utils.Extensions;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContextPool<DataContext>(options => options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DataContextConnection")
-        ?? throw new InvalidOperationException("Connection string 'DataContextConnection' not found.")
-    )
-);
-
-var allowedOrigin = builder.Configuration["AllowedHosts"];
-var clientPort = builder.Configuration["ClientPort"];
-if (clientPort != null) allowedOrigin += $":{clientPort}";
-
-builder.Services.AddCors(options => options.AddPolicy(
-    "DefaultCorsPolicy",
-    policy => policy.SetIsOriginAllowed(
-        origin => origin == $"https://{allowedOrigin}"
-        )
-        .AllowAnyMethod()
-        .AllowAnyHeader()
-        .AllowCredentials()
-    )
-);
-
-builder.Services.AddSession();
+    builder.Configuration.GetConnectionString("DataContextConnection") ?? throw new InvalidOperationException("Connection string 'DataContextConnection' not found.")
+));
 
 builder.Services.AddIdentityCore<User>(options =>
 {
-    options.SignIn.RequireConfirmedAccount = true;
     options.ClaimsIdentity.UserIdClaimType = ClaimsPrincipalFactory.UserIdClaimType;
 })
     .AddRoles<Role>()
@@ -51,27 +27,14 @@ builder.Services.AddIdentityCore<User>(options =>
 builder.Services.AddDistributedMemoryCache(); // adds in-memory cache as IDistributedCache stub
 builder.Services.AddSingleton<ITicketStore, TicketStore>(); // uses IDistributedCache to store session tickets
 
-builder.Services.AddSingleton<JwtSecurityTokenHandler>();
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new()
+builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)
+    .AddIdentityCookies(identity => identity.ApplicationCookie.Configure<ITicketStore>((cookie, store) =>
     {
-        ValidIssuer = "https://localhost:7166", // https should come first
-        ValidAudience = allowedOrigin,
-        IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(
-                builder.Configuration["Jwt:Key"]
-            )
-        ),
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateIssuerSigningKey = true,
-        ValidateLifetime = true
-    };
-});
+        cookie.SessionStore = store;
+        cookie.Cookie.IsEssential = true;
+        cookie.Cookie.HttpOnly = true;
+        cookie.Cookie.SameSite = SameSiteMode.Strict;
+    }));
 
 builder.Services.AddSingleton<IAuthorizationHandler, ContentAuthorizationHandler>();
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, ContentPolicyProvider>();
@@ -88,9 +51,8 @@ var app = builder.Build();
 
 var seeding = app.Services.SeedDataContext(
     "admin@anafora.net",
-    // set password in project root dir: dotnet user-secrets set anafora-admin-password <password>
-    builder.Configuration.GetValue<string>("anafora-admin-password")
-    ?? throw new InvalidOperationException("Admin password not found.")
+    // in project root dir: dotnet user-secrets set anafora-admin-password <password>
+    builder.Configuration.GetValue<string>("anafora-admin-password") ?? throw new InvalidOperationException("Admin password not found.")
 );
 
 if (app.Environment.IsProduction())
@@ -102,8 +64,6 @@ if (app.Environment.IsProduction())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
-app.UseCors("DefaultCorsPolicy");
-app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
