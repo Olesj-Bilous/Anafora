@@ -11,12 +11,13 @@ namespace AnaforaWeb.Utils
             _cache = cache;
         }
 
-        private readonly IDistributedCache _cache;
         private const string prefix = "SessionTicket-";
+        private readonly IDistributedCache _cache;
+        private readonly IDataSerializer<AuthenticationTicket> _ticketSerializer = TicketSerializer.Default;
 
         public async Task<string> StoreAsync(AuthenticationTicket ticket)
         {
-            string key = prefix + Guid.NewGuid().ToString();
+            string key = Guid.NewGuid().ToString();
             await RenewAsync(key, ticket);
             return key;
         }
@@ -25,19 +26,18 @@ namespace AnaforaWeb.Utils
         {
             var options = new DistributedCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(40));
             if (ticket.Properties.ExpiresUtc.HasValue) options.SetAbsoluteExpiration(ticket.Properties.ExpiresUtc.Value);
-            await _cache.SetAsync(key, TicketSerializer.Default.Serialize(ticket), options);
+            await _cache.SetAsync($"{prefix}{key}", _ticketSerializer.Serialize(ticket), options);
         }
 
-        public async Task<AuthenticationTicket> RetrieveAsync(string key)
+        public async Task<AuthenticationTicket?> RetrieveAsync(string key)
         {
-            var bytes = await _cache.GetAsync(key);
-            var ticket = bytes == null ? null : TicketSerializer.Default.Deserialize(bytes);
-            return ticket;
+            var bytes = await _cache.GetAsync($"{prefix}{key}");
+            return bytes == null ? null : _ticketSerializer.Deserialize(bytes);
         }
 
         public async Task RemoveAsync(string key)
         {
-            await _cache.RemoveAsync(key);
+            await _cache.RemoveAsync($"{prefix}{key}");
         }
     }
 }

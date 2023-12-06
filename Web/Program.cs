@@ -1,5 +1,6 @@
 using AnaforaData.Context;
 using AnaforaData.Model;
+using AnaforaWeb.Authentication;
 using AnaforaWeb.Authorization;
 using AnaforaWeb.Utils;
 using AnaforaWeb.Utils.Extensions;
@@ -37,34 +38,39 @@ builder.Services.AddCors(options => options.AddPolicy(
 
 builder.Services.AddSession();
 
-builder.Services.AddIdentityCore<User>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddIdentityCore<User>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = true;
+    options.ClaimsIdentity.UserIdClaimType = ClaimsPrincipalFactory.UserIdClaimType;
+})
     .AddRoles<Role>()
     .AddEntityFrameworkStores<DataContext>()
-    .AddSignInManager<SignInManager<User>>()
+    .AddClaimsPrincipalFactory<ClaimsPrincipalFactory>()
     .AddDefaultTokenProviders();
 
-builder.Services.AddDistributedMemoryCache(); // adds default in-memory cache as IDistributedCache
-builder.Services.AddSingleton<ITicketStore, TicketStore>(); // depends on IDistributedCache
+builder.Services.AddDistributedMemoryCache(); // adds in-memory cache as IDistributedCache stub
+builder.Services.AddSingleton<ITicketStore, TicketStore>(); // uses IDistributedCache to store session tickets
 
 builder.Services.AddSingleton<JwtSecurityTokenHandler>();
-
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options => options.TokenValidationParameters = new()
+}).AddJwtBearer(options =>
 {
-    ValidIssuer = "https://localhost:7166", // https should come first
-    ValidAudience = allowedOrigin,
-    IssuerSigningKey = new SymmetricSecurityKey(
+    options.TokenValidationParameters = new()
+    {
+        ValidIssuer = "https://localhost:7166", // https should come first
+        ValidAudience = allowedOrigin,
+        IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(
                 builder.Configuration["Jwt:Key"]
             )
         ),
-    ValidateIssuer = true,
-    ValidateAudience = true,
-    ValidateIssuerSigningKey = true,
-    ValidateLifetime = true
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateIssuerSigningKey = true,
+        ValidateLifetime = true
+    };
 });
 
 builder.Services.AddSingleton<IAuthorizationHandler, ContentAuthorizationHandler>();

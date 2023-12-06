@@ -1,4 +1,5 @@
 ﻿using AnaforaData.Model;
+using AnaforaWeb.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -7,7 +8,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace AnaforaWeb.Controllers
 {
@@ -16,21 +16,21 @@ namespace AnaforaWeb.Controllers
     {
         public AccountController(
             UserManager<User> userManager,
-            SignInManager<User> signInManager,
             IOptionsMonitor<JwtBearerOptions> jwtOptions,
-            JwtSecurityTokenHandler jwtHandler
+            JwtSecurityTokenHandler tokenHandler,
+            IUserClaimsPrincipalFactory<User> principalFactory
         )
         {
-            _signInManager = signInManager;
             _userManager = userManager;
             _jwtOptions = jwtOptions;
-            _jwtHandler = jwtHandler;
+            _tokenHandler = tokenHandler;
+            _principalFactory = principalFactory;
         }
 
         private readonly UserManager<User> _userManager;
-        private readonly SignInManager<User> _signInManager;
         private readonly IOptionsMonitor<JwtBearerOptions> _jwtOptions;
-        private readonly JwtSecurityTokenHandler _jwtHandler;
+        private readonly JwtSecurityTokenHandler _tokenHandler;
+        private readonly IUserClaimsPrincipalFactory<User> _principalFactory;
 
         public class SignInModel
         {
@@ -51,11 +51,11 @@ namespace AnaforaWeb.Controllers
             var valid = await _userManager.CheckPasswordAsync(user, signIn.Password);
             if (valid)
             {
-                if (User.Identity == null) throw new Exception("User had no identity!");
+                var principal = await _principalFactory.CreateAsync(user);
                 var parameters = _jwtOptions.Get(JwtBearerDefaults.AuthenticationScheme).TokenValidationParameters;
                 var token = new SecurityTokenDescriptor()
                 {
-                    Subject = (ClaimsIdentity)User.Identity,
+                    Subject = principal.Identities.First(),
                     Issuer = parameters.ValidIssuer,
                     Audience = parameters.ValidAudience,
                     SigningCredentials = new SigningCredentials(
@@ -64,7 +64,8 @@ namespace AnaforaWeb.Controllers
                     ),
                     Expires = DateTime.UtcNow.AddMinutes(20)
                 };
-                return Ok(_jwtHandler.WriteToken(_jwtHandler.CreateToken(token)));
+                token.Claims.Add(ClaimsPrincipalFactory.SessionIdClaimType, HttpContext.Session.Id);
+                return Ok(_tokenHandler.WriteToken(_tokenHandler.CreateToken(token)));
             }
             return Unauthorized();
         }

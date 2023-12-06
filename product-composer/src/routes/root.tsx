@@ -1,18 +1,19 @@
-import { Outlet, Link } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import './root.css';
+import { NavLink } from 'react-router-dom';
 
 function Root() {
-    return (
-        <>
-            <nav>
-                <Link to={'workshop'}>Workshop</Link>
-                <Link to={'storefront'}>Storefront</Link>
-            </nav>
-            <main>
-                <Outlet />
-            </main>
-        </>
-    );
+  return (
+    <>
+      <nav>
+        <NavLink to={'products'}>Products</NavLink>
+        <NavLink to={'signin'}>Sign in</NavLink>
+      </nav>
+      <main>
+        <Outlet />
+      </main>
+    </>
+  );
 }
 
 export default Root;
