@@ -1,5 +1,6 @@
 ﻿using AnaforaData.Utils.Enums;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace AnaforaWeb.Authorization
 {
@@ -22,7 +23,7 @@ namespace AnaforaWeb.Authorization
 
         public Task<AuthorizationPolicy> GetDefaultPolicyAsync()
         {
-            return Task.FromResult(new AuthorizationPolicyBuilder("Bearer")
+            return Task.FromResult(new AuthorizationPolicyBuilder(IdentityConstants.ApplicationScheme)
                 .RequireAuthenticatedUser().Build());
         }
 

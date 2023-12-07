@@ -1,11 +1,10 @@
 using AnaforaData.Context;
 using AnaforaData.Model;
 using AnaforaWeb.Authentication;
-using AnaforaWeb.Authorization;
+using AnaforaWeb.Routes;
 using AnaforaWeb.Utils;
 using AnaforaWeb.Utils.Extensions;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,25 +26,13 @@ builder.Services.AddIdentityCore<User>(options =>
 builder.Services.AddDistributedMemoryCache(); // adds in-memory cache as IDistributedCache stub
 builder.Services.AddSingleton<ITicketStore, TicketStore>(); // uses IDistributedCache to store session tickets
 
-builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)
-    .AddIdentityCookies(identity => identity.ApplicationCookie.Configure<ITicketStore>((cookie, store) =>
-    {
-        cookie.SessionStore = store;
-        cookie.Cookie.IsEssential = true;
-        cookie.Cookie.HttpOnly = true;
-        cookie.Cookie.SameSite = SameSiteMode.Strict;
-    }));
 
-builder.Services.AddSingleton<IAuthorizationHandler, ContentAuthorizationHandler>();
-builder.Services.AddSingleton<IAuthorizationPolicyProvider, ContentPolicyProvider>();
 
-builder.Services.AddAuthorization(options =>
-{
-    options.FallbackPolicy = options.DefaultPolicy; // fall back to authentication
-});
+builder.Services.Configure<RouteOptions>(options => options.ConstraintMap.Add("pageroute", typeof(PageRouteConstraint)));
 
 builder.Services.AddControllers();
-
+builder.Services.AddReverseProxy().LoadFromConfig(
+    builder.Configuration.GetSection("ReverseProxy"));
 
 var app = builder.Build();
 
@@ -63,10 +50,8 @@ if (app.Environment.IsProduction())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
-app.UseAuthentication();
-app.UseAuthorization();
 app.MapControllers();
+app.MapReverseProxy();
 
 await seeding;
 
